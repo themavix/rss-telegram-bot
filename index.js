@@ -6,7 +6,6 @@ require('dotenv').config();
 const parser = new Parser();
 const token = process.env.TELEGRAM_BOT_KEY;
 const bot = new TelegramBot(token, { polling: true });
-
 const store = new Set();
 
 cron.schedule('* * * * *', async () => {
