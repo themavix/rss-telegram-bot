@@ -1,25 +1,31 @@
 const Parser = require('rss-parser');
 const TelegramBot = require('node-telegram-bot-api');
-const cron = require('node-cron');
 require('dotenv').config();
 
 const parser = new Parser();
 const token = process.env.TELEGRAM_BOT_KEY;
-const bot = new TelegramBot(token, { polling: true });
-const store = new Set();
+const bot = new TelegramBot(token, { polling: false });
 
-cron.schedule('* * * * *', async () => {
+const isToday = (someDate) => {
+    const today = new Date();
+
+    return someDate.getDate() == today.getDate() &&
+      someDate.getMonth() == today.getMonth() &&
+      someDate.getFullYear() == today.getFullYear();
+}
+
+(async () => {
     try {
         const feed = await parser.parseURL('https://www.jw-russia.org/rss.xml');
   
-        feed.items.reverse().forEach(({ guid, title, link }, index) => {
-            if (!store.has(guid)) {
-                store.add(guid);
+        feed.items.reverse().forEach(({ guid, title, link, isoDate }, index) => {
+            const eventDate = new Date(isoDate);
 
-                setTimeout(() => bot.sendMessage('@mytestrsschannel', `${title}\n${link}`), index * 5000)
+            if (isToday(eventDate)) {
+                setTimeout(() => bot.sendMessage('@mytestrsschannel', `${title}\n\n${eventDate.toLocaleDateString('ru-RU')}\n\n${link}`), index * 10000)
             }
         });
     } catch (error) {
         console.error(error);
     }
-});
+})();
