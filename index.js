@@ -16,7 +16,6 @@ const isToday = (someDate) => {
 
 (async () => {
     try {
-        bot.sendMessage('@mytestrsschannel', `Проверка новостей`);
         const feed = await parser.parseURL('https://www.jw-russia.org/rss.xml');
   
         feed.items.reverse().forEach(({ guid, title, link, isoDate }, index) => {
